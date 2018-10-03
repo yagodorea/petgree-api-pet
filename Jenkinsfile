@@ -11,6 +11,7 @@ pipeline {
                 sh 'pwd'
 		sh 'ls -la'
 		sh 'id'
+		sh 'wget www.uol.com.br'
                 sh 'mvn -B -DskipTests clean package' 
             }
         }
