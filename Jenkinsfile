@@ -10,6 +10,7 @@ pipeline {
             steps {
                 sh 'pwd'
 		sh 'ls -la'
+		sh 'id'
                 sh 'mvn -B -DskipTests clean package' 
             }
         }
