@@ -1,0 +1,23 @@
+
+Vsquid:S1854"<Remove this useless assignment to local variable "response".(İ¨…Éşÿÿÿÿ
+ksquid:UselessImportCheck"DRemove this unused import 'org.springframework.http.ResponseEntity'.(¶¯ø¦úÿÿÿÿ
+psquid:S1450"[Remove the "restTemplate" field and declare it as a local variable in the relevant methods.(„¤Ïƒ
+M
+squid:S106"9Replace this use of System.out or System.err by a logger.(’º÷”
+csquid:S4488"NReplace "@RequestMapping(method = RequestMethod.DELETE)" with "@DeleteMapping"(•“ÛÏ
+M
+squid:S106"9Replace this use of System.out or System.err by a logger.(¸ã¥¥
+Gsquid:S1135"2Complete the task associated to this TODO comment.(¤Ÿ¬²
+]squid:S4488"HReplace "@RequestMapping(method = RequestMethod.GET)" with "@GetMapping"(ğÄâÿ
+R
+squid:S106"9Replace this use of System.out or System.err by a logger.(À¿Øªüÿÿÿÿ
+Ksquid:S1153"1Directly append the argument of String.valueOf().(İ¨…Éşÿÿÿÿ
+dsquid:S4488"JReplace "@RequestMapping(method = RequestMethod.POST)" with "@PostMapping"(Õ¡¤ùÿÿÿÿ
+R
+squid:S106"9Replace this use of System.out or System.err by a logger.(¢ù‡ÿÿÿÿÿ
+R
+squid:S106"9Replace this use of System.out or System.err by a logger.(Í’İëúÿÿÿÿ
+Gsquid:S1481"-Remove this unused "response" local variable.(İ¨…Éşÿÿÿÿ
+]squid:S4488"HReplace "@RequestMapping(method = RequestMethod.GET)" with "@GetMapping"(¤úÙ
+]squid:S4488"HReplace "@RequestMapping(method = RequestMethod.PUT)" with "@PutMapping"(Õç¼ñ
+;squid:S1170"!Make this final field static too.(ªÖÒŞùÿÿÿÿ
