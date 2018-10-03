@@ -21,7 +21,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public Pet getPetById(Long id) {
-        return petRepository.findOne(id);
+        return petRepository.getOne(id);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class PetServiceImpl implements PetService {
     public void deletePet(Long id) {
         Pet pet = getPetById(id);
         if (pet != null) {
-            petRepository.delete(id);
+            petRepository.deleteById(id);
         }
     }
 }

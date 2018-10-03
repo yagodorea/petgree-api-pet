@@ -13,23 +13,21 @@ import com.dorea.petgree.pet.service.PetService;
 import com.dorea.petgree.pet.validate.ValidatePet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
-public class PetController extends WebMvcConfigurerAdapter {
+public class PetController implements WebMvcConfigurer {
 
     @Autowired
     private PetService petService;
 
-    private RestTemplate restTemplate;
     private final String userApiUrl = "http://ec2-18-228-44-159.sa-east-1.compute.amazonaws.com:4243/users";
 
     @Override
@@ -56,9 +54,9 @@ public class PetController extends WebMvcConfigurerAdapter {
     		throw new NeedCreatorIdException();
         } else {
     		// Procurar o usuário na API User
-	        restTemplate = new RestTemplate();
+	        RestTemplate restTemplate = new RestTemplate();
 	        try {
-	        	User response = restTemplate.getForObject(userApiUrl + "/email/" + String.valueOf(pet.getCreated_by()),User.class);
+	        	restTemplate.getForObject(userApiUrl + "/email/" + String.valueOf(pet.getCreated_by()),User.class);
 	        } catch (HttpClientErrorException error) {
 	        	throw new CreatorNotFoundException(error.getMessage());
 	        }
