@@ -6,12 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="petgree" />
         <module name="petgree-api-pet" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="petgree" target="1.8" />
       <module name="petgree-api-pet" target="1.8" />
     </bytecodeTargetLevel>
   </component>
