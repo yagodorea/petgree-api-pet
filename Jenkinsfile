@@ -8,11 +8,7 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                sh 'pwd'
-		sh 'ls -la'
-		sh 'id'
-		sh 'wget www.uol.com.br'
-                sh 'mvn -B -DskipTests clean package' 
+                sh 'mvn clean package' 
             }
         }
     }
