@@ -1,0 +1,13 @@
+<settings>
+    <servers>
+        <server>
+            <id>ssh-aws</id>
+            <username>ec2-user</username>
+            <privateKey>${HOME}/yagodorea.pem</privateKey> <!-- not needed if using pageant -->
+            <configuration>
+                <sshExecutable>ssh</sshExecutable>
+                <scpExecutable>scp</scpExecutable>
+            </configuration>
+        </server>
+    </servers>
+</settings>
