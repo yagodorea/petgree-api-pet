@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
+                sh 'wget www.uol.com.br'
                 sh 'mvn clean package' 
             }
         }
