@@ -6,7 +6,7 @@ VOLUME /tmp
 
 EXPOSE 4242
 
-ARG JAR_FILE=target/petgree-api-pet-1.0-SNAPSHOT.jar
+ARG JAR_FILE=target/petgree-api-pet*.jar
 
 ADD ${JAR_FILE} petgree-api-pet.jar
 
