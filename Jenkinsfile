@@ -21,10 +21,5 @@ pipeline {
                 }
             }
         }
-        stage('Deliver') {
-            steps {
-                sh 'mvn deploy'
-            }
-        }
     }
 }

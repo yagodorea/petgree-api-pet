@@ -6,6 +6,8 @@ import com.dorea.petgree.pet.domain.PetColor.ColorPet;
 import com.dorea.petgree.pet.domain.PetGender;
 import com.dorea.petgree.pet.domain.PetGender.GenderPet;
 import com.dorea.petgree.pet.domain.PetModel;
+import com.dorea.petgree.pet.domain.PetPelo;
+import com.dorea.petgree.pet.domain.PetPelo.PeloPet;
 import com.dorea.petgree.pet.domain.PetSize;
 import com.dorea.petgree.pet.domain.PetStatus;
 import com.dorea.petgree.pet.domain.PetType;
@@ -16,6 +18,8 @@ import com.dorea.petgree.pet.domain.PetStatus.StatusPet;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class PetConverter {
@@ -36,7 +40,7 @@ public class PetConverter {
 		}
 
 		if (petModel.getType() != null) {
-			TypePet typePet = PetType.TypePet.getType(petModel.getType().toUpperCase());
+			TypePet typePet = TypePet.getType(petModel.getType().toUpperCase());
 			if (typePet != null) {
 				PetType petType = new PetType();
 				petType.setId(typePet.getType());
@@ -45,7 +49,7 @@ public class PetConverter {
 		}
 
 		if (petModel.getGender() != null) {
-			GenderPet genderPet = PetGender.GenderPet.getGender(petModel.getGender().toUpperCase());
+			GenderPet genderPet = GenderPet.getGender(petModel.getGender().toUpperCase());
 			if (genderPet != null) {
 				PetGender petGender = new PetGender();
 				petGender.setId(genderPet.getGender());
@@ -54,7 +58,7 @@ public class PetConverter {
 		}
 
 		if (petModel.getSize() != null) {
-			SizePet sizePet = PetSize.SizePet.getSize(petModel.getSize().toUpperCase());
+			SizePet sizePet = SizePet.getSize(petModel.getSize().toUpperCase());
 			if (sizePet != null) {
 				PetSize petSize = new PetSize();
 				petSize.setId(sizePet.getSize());
@@ -62,17 +66,30 @@ public class PetConverter {
 			}
 		}
 
-		if (petModel.getColor() != null) {
-			ColorPet colorPet = PetColor.ColorPet.getColor(petModel.getColor().toUpperCase());
-			if (colorPet != null) {
-				PetColor petColor = new PetColor();
-				petColor.setId(colorPet.getColor());
-				pet.setColor(petColor);
+		if (petModel.getPelo() != null) {
+			PeloPet peloPet = PeloPet.getPelo(petModel.getPelo().toUpperCase());
+			if (peloPet != null) {
+				PetPelo petPelo= new PetPelo();
+				petPelo.setId(peloPet.getPelo());
+				pet.setPelo(petPelo);
 			}
 		}
 
+		if (petModel.getColors() != null) {
+			Set<PetColor> colors = new HashSet<>();
+			for (String color : petModel.getColors()) {
+				ColorPet colorPet = ColorPet.getColor(color.toUpperCase());
+				if (colorPet != null) {
+					PetColor petColor = new PetColor();
+					petColor.setId(colorPet.getColor());
+					colors.add(petColor);
+				}
+			}
+			pet.setColors(colors);
+		}
+
 		if (petModel.getStatus() != null) {
-			StatusPet statusPet = PetStatus.StatusPet.getStatus(petModel.getStatus().toUpperCase());
+			StatusPet statusPet = StatusPet.getStatus(petModel.getStatus().toUpperCase());
 			if (statusPet != null) {
 				PetStatus petStatus = new PetStatus();
 				petStatus.setId(statusPet.getStatus());
@@ -83,8 +100,6 @@ public class PetConverter {
 			petStatus.setId(0);
 			pet.setStatus(petStatus);
 		}
-
-		pet.setSpots(petModel.isSpots());
 
 		if (petModel.getDescription() != null) {
 			pet.setDescription(petModel.getDescription());
@@ -108,6 +123,10 @@ public class PetConverter {
 
 		if (petModel.getLon() != null) {
 			pet.setLon(petModel.getLon());
+		}
+
+		if (petModel.getFotos() != null) {
+			pet.setFotos(petModel.getFotos());
 		}
 
 		pet.setDt_created(Timestamp.from(Instant.now()));

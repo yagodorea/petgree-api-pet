@@ -2,7 +2,9 @@ package com.dorea.petgree.pet.domain;
 
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Entity
 @Table(name = "pets")
@@ -29,6 +32,9 @@ public class Pet implements Serializable {
     @JoinColumn(name = "type",referencedColumnName = "id_type")
     private PetType type;
 
+    @Column(name = "raca")
+    private String raca;
+
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "gender",referencedColumnName = "id_gender")
     private PetGender gender;
@@ -37,16 +43,20 @@ public class Pet implements Serializable {
     @JoinColumn(name = "size",referencedColumnName = "id_size")
     private PetSize size;
 
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "color",referencedColumnName = "id_color")
-    private PetColor color;
+    @ElementCollection
+    @CollectionTable(name = "colors")
+    private Set<PetColor> colors;
+
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name = "pelo",referencedColumnName = "id_pelo")
+	private PetPelo pelo;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "status",referencedColumnName = "id_status")
     private PetStatus status;
 
-    @Column(name = "spots")
-    private boolean spots;
+    @Column(name = "owner_id")
+	private Long owner_id;
 
     @Column(name = "description")
     private String description;
@@ -62,6 +72,10 @@ public class Pet implements Serializable {
 
 	@Column(name = "lon")
 	private Float lon;
+
+	@ElementCollection
+	@CollectionTable(name = "fotos")
+	private Set<String> fotos;
 
 	@Column(name = "dt_created")
 	private Timestamp dt_created;
@@ -110,7 +124,15 @@ public class Pet implements Serializable {
         this.type = type;
     }
 
-    public PetGender getGender() {
+	public String getRaca() {
+		return raca;
+	}
+
+	public void setRaca(String raca) {
+		this.raca = raca;
+	}
+
+	public PetGender getGender() {
         return gender;
     }
 
@@ -126,26 +148,41 @@ public class Pet implements Serializable {
         this.size = size;
     }
 
-
-    public PetColor getColor() {
-        return color;
+    public Set<PetColor> getColors() {
+        return colors;
     }
 
-    public void setColor(PetColor color) {
-        this.color = color;
+    public void setColors(Set<PetColor> color) {
+        this.colors = color;
     }
+
+	public PetPelo getPelo() {
+		return pelo;
+	}
+
+	public void setPelo(PetPelo pelo) {
+		this.pelo = pelo;
+	}
+
+	public Long getOwner_id() {
+		return owner_id;
+	}
+
+	public void setOwner_id(Long owner_id) {
+		this.owner_id = owner_id;
+	}
+
+	public Set<String> getFotos() {
+		return fotos;
+	}
+
+	public void setFotos(Set<String> fotos) {
+		this.fotos = fotos;
+	}
 
 	public PetStatus getStatus() { return status; }
 
 	public void setStatus(PetStatus status) { this.status = status; }
-
-	public boolean isSpots() {
-		return spots;
-	}
-
-    public void setSpots(boolean spots) {
-        this.spots = spots;
-    }
 
     public String getDescription() {
         return description;

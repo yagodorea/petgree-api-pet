@@ -2,6 +2,8 @@ package com.dorea.petgree.pet.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Set;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PetModel {
 
@@ -16,12 +18,15 @@ public class PetModel {
 
 	private String size;
 
-	private String color;
+	private String pelo;
+
+	private Set<String> colors;
+
+	private Set<String> fotos;
 
 	private String status;
 
-	@JsonInclude(JsonInclude.Include.ALWAYS)
-	private boolean spots;
+	private String owner_id;
 
 	@JsonInclude(JsonInclude.Include.ALWAYS)
 	private String description;
@@ -94,12 +99,20 @@ public class PetModel {
 		this.size = size;
 	}
 
-	public String getColor() {
-		return color;
+	public String getPelo() {
+		return pelo;
 	}
 
-	public void setColor(String color) {
-		this.color = color;
+	public void setPelo(String pelo) {
+		this.pelo = pelo;
+	}
+
+	public Set<String> getColors() {
+		return colors;
+	}
+
+	public void setColors(Set<String> color) {
+		this.colors = color;
 	}
 
 	public String getStatus() {
@@ -110,12 +123,20 @@ public class PetModel {
 		this.status = status;
 	}
 
-	public boolean isSpots() {
-		return spots;
+	public Set<String> getFotos() {
+		return fotos;
 	}
 
-	public void setSpots(boolean spots) {
-		this.spots = spots;
+	public void setFotos(Set<String> fotos) {
+		this.fotos = fotos;
+	}
+
+	public String getOwner_id() {
+		return owner_id;
+	}
+
+	public void setOwner_id(String owner_id) {
+		this.owner_id = owner_id;
 	}
 
 	public String getDescription() {

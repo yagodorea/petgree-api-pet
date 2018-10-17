@@ -3,6 +3,7 @@ package com.dorea.petgree.pet.controller;
 import com.dorea.petgree.pet.controller.converter.PetConverter;
 import com.dorea.petgree.pet.domain.Pet;
 import com.dorea.petgree.pet.domain.PetModel;
+import com.dorea.petgree.pet.domain.json.Photo;
 import com.dorea.petgree.pet.domain.json.User;
 import com.dorea.petgree.pet.exception.CreatorNotFoundException;
 import com.dorea.petgree.pet.exception.IdForbiddenException;
@@ -10,6 +11,7 @@ import com.dorea.petgree.pet.exception.InvalidInputException;
 import com.dorea.petgree.pet.exception.NeedCreatorIdException;
 import com.dorea.petgree.pet.exception.PetNotFoundException;
 import com.dorea.petgree.pet.service.PetService;
+import com.dorea.petgree.pet.specification.PetFilter;
 import com.dorea.petgree.pet.validate.ValidatePet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,9 +68,20 @@ public class PetController implements WebMvcConfigurer {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public List<Pet> getPets() {
+    public List<Pet> getPets(
+    		@RequestParam(required = false) String type,
+		    @RequestParam(required = false) String color,
+		    @RequestParam(required = false) String gender,
+		    @RequestParam(required = false) String raca,
+		    @RequestParam(required = false) String pelo,
+		    @RequestParam(required = false) String size,
+		    @RequestParam(required = false) String status) {
         System.out.println("getPets invoked.");
-        return petService.getPets();
+	    PetFilter filter = new PetFilter();
+
+	    filter.setAllFilters(type,color,gender,raca,pelo,size,status);
+
+        return petService.getByFilter(filter);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -109,5 +122,17 @@ public class PetController implements WebMvcConfigurer {
             throw new PetNotFoundException(id);
         }
         return pet;
+    }
+
+    @RequestMapping(value = "/{id}/fotos", method = RequestMethod.PATCH)
+	public Pet addPhoto(@PathVariable("id") Long id,
+                        @RequestBody Photo photo) {
+    	System.out.println("addPhoto invoked.");
+    	Pet pet = petService.getPetById(id);
+    	if (pet == null) {
+    		throw new PetNotFoundException(id);
+	    }
+	    petService.addPhoto(photo.getImageUrl(),id);
+    	return pet;
     }
 }

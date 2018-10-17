@@ -12,6 +12,9 @@ import com.dorea.petgree.pet.domain.PetType.TypePet;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ValidatePetTest {
 
 	@Test
@@ -20,7 +23,9 @@ public class ValidatePetTest {
 
 		PetColor color = new PetColor();
 		color.setId(ColorPet.BRANCO.getColor());
-		pet.setColor(color);
+		Set<PetColor> colors = new HashSet<>();
+		colors.add(color);
+		pet.setColors(colors);
 
 		PetGender gender = new PetGender();
 		gender.setId(GenderPet.MACHO.getGender());
