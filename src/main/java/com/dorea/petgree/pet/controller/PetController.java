@@ -22,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/pets")
@@ -63,14 +64,16 @@ public class PetController implements WebMvcConfigurer {
 	        	throw new CreatorNotFoundException(error.getMessage());
 	        }
         }
-        return petService.postPet(pet);
+	    Long id = petService.postPet(pet).getId();
+    	Pet posted = getPet(id);
+        return posted;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public List<Pet> getPets(
     		@RequestParam(required = false) String type,
-		    @RequestParam(required = false) String color,
+		    @RequestParam(required = false) String colors[],
 		    @RequestParam(required = false) String gender,
 		    @RequestParam(required = false) String raca,
 		    @RequestParam(required = false) String pelo,
@@ -79,7 +82,7 @@ public class PetController implements WebMvcConfigurer {
         System.out.println("getPets invoked.");
 	    PetFilter filter = new PetFilter();
 
-	    filter.setAllFilters(type,color,gender,raca,pelo,size,status);
+	    filter.setAllFilters(type,colors,gender,raca,pelo,size,status);
 
         return petService.getByFilter(filter);
     }
@@ -89,24 +92,22 @@ public class PetController implements WebMvcConfigurer {
                          @RequestBody PetModel petModel) {
 	    System.out.println("putPet invoked.");
 
-	    Pet pet = petService.getPetById(id);
-	    if (pet == null) {
+	    Optional<Pet> pet = petService.getPetById(id);
+	    if (!pet.isPresent()) {
 		    throw new PetNotFoundException(id);
 	    }
 
-	    pet = PetConverter.toPet(petModel, pet);
+	    Pet converted = PetConverter.toPet(petModel, pet.get());
 
-	    return petService.postPet(pet);
+	    return petService.postPet(converted);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePet(@PathVariable Long id) {
 	    System.out.println("deletePet invoked.");
-	    if (petService.getPetById(id) != null) {
-
-	        // TODO: Adicionar validação de ONG
-
+	    Optional<Pet> pet = petService.getPetById(id);
+	    if (pet.isPresent()) {
 	        petService.deletePet(id);
         }
         else {
@@ -117,22 +118,22 @@ public class PetController implements WebMvcConfigurer {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Pet getPet(@PathVariable("id") Long id) {
 	    System.out.println("getPet invoked.");
-	    Pet pet = petService.getPetById(id);
-        if (pet == null) {
+	    Optional<Pet> pet = petService.getPetById(id);
+        if (!pet.isPresent()) {
             throw new PetNotFoundException(id);
         }
-        return pet;
+        return pet.get();
     }
 
     @RequestMapping(value = "/{id}/fotos", method = RequestMethod.PATCH)
 	public Pet addPhoto(@PathVariable("id") Long id,
                         @RequestBody Photo photo) {
     	System.out.println("addPhoto invoked.");
-    	Pet pet = petService.getPetById(id);
-    	if (pet == null) {
+	    Optional<Pet> pet = petService.getPetById(id);
+	    if (!pet.isPresent()) {
     		throw new PetNotFoundException(id);
 	    }
 	    petService.addPhoto(photo.getImageUrl(),id);
-    	return pet;
+    	return pet.get();
     }
 }

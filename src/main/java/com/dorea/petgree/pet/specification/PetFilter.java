@@ -2,16 +2,16 @@ package com.dorea.petgree.pet.specification;
 
 public class PetFilter {
 	private String type;
-	private String color;
+	private String[] colors;
 	private String gender;
 	private String raca;
 	private String pelo;
 	private String size;
 	private String status;
 
-	public void setAllFilters(String type, String color, String gender, String raca, String pelo, String size, String status) {
+	public void setAllFilters(String type, String[] colors, String gender, String raca, String pelo, String size, String status) {
 		this.type = type;
-		this.color= color;
+		this.colors= colors;
 		this.gender = gender;
 		this.raca = raca;
 		this.pelo = pelo;
@@ -27,12 +27,12 @@ public class PetFilter {
 		this.type = type;
 	}
 
-	public String getColor() {
-		return color;
+	public String[] getColors() {
+		return colors;
 	}
 
-	public void setColor(String color) {
-		this.color = color;
+	public void setColors(String[] colors) {
+		this.colors = colors;
 	}
 
 	public String getGender() {

@@ -14,6 +14,8 @@ public class PetModel {
 
 	private String type;
 
+	private String raca;
+
 	private String gender;
 
 	private String size;
@@ -81,6 +83,14 @@ public class PetModel {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getRaca() {
+		return raca;
+	}
+
+	public void setRaca(String raca) {
+		this.raca = raca;
 	}
 
 	public String getGender() {

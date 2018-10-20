@@ -14,6 +14,7 @@ import com.dorea.petgree.pet.domain.PetType;
 import com.dorea.petgree.pet.domain.PetType.TypePet;
 import com.dorea.petgree.pet.domain.PetSize.SizePet;
 import com.dorea.petgree.pet.domain.PetStatus.StatusPet;
+import org.springframework.util.ObjectUtils;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -33,13 +34,13 @@ public class PetConverter {
 			pet.setId(petModel.getId());
 		}
 
-		if (petModel.getName() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getName())) {
 			pet.setName(petModel.getName());
-		} else if (pet.getName() == null) {
+		} else if (ObjectUtils.isEmpty(pet.getName())) {
 			pet.setName("Sem nome");
 		}
 
-		if (petModel.getType() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getType())) {
 			TypePet typePet = TypePet.getType(petModel.getType().toUpperCase());
 			if (typePet != null) {
 				PetType petType = new PetType();
@@ -48,7 +49,11 @@ public class PetConverter {
 			}
 		}
 
-		if (petModel.getGender() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getRaca())) {
+			pet.setRaca(petModel.getRaca());
+		}
+
+		if (!ObjectUtils.isEmpty(petModel.getGender())) {
 			GenderPet genderPet = GenderPet.getGender(petModel.getGender().toUpperCase());
 			if (genderPet != null) {
 				PetGender petGender = new PetGender();
@@ -57,7 +62,7 @@ public class PetConverter {
 			}
 		}
 
-		if (petModel.getSize() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getSize())) {
 			SizePet sizePet = SizePet.getSize(petModel.getSize().toUpperCase());
 			if (sizePet != null) {
 				PetSize petSize = new PetSize();
@@ -66,7 +71,7 @@ public class PetConverter {
 			}
 		}
 
-		if (petModel.getPelo() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getPelo())) {
 			PeloPet peloPet = PeloPet.getPelo(petModel.getPelo().toUpperCase());
 			if (peloPet != null) {
 				PetPelo petPelo= new PetPelo();
@@ -75,7 +80,7 @@ public class PetConverter {
 			}
 		}
 
-		if (petModel.getColors() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getColors())) {
 			Set<PetColor> colors = new HashSet<>();
 			for (String color : petModel.getColors()) {
 				ColorPet colorPet = ColorPet.getColor(color.toUpperCase());
@@ -88,32 +93,32 @@ public class PetConverter {
 			pet.setColors(colors);
 		}
 
-		if (petModel.getStatus() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getStatus())) {
 			StatusPet statusPet = StatusPet.getStatus(petModel.getStatus().toUpperCase());
 			if (statusPet != null) {
 				PetStatus petStatus = new PetStatus();
 				petStatus.setId(statusPet.getStatus());
 				pet.setStatus(petStatus);
 			}
-		} else if (pet.getStatus() == null) { // Se não vier com status, é um animal perdido
+		} else if (ObjectUtils.isEmpty(pet.getStatus())) { // Se não vier com status, é um animal perdido
 			PetStatus petStatus = new PetStatus();
 			petStatus.setId(0);
 			pet.setStatus(petStatus);
 		}
 
-		if (petModel.getDescription() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getDescription())) {
 			pet.setDescription(petModel.getDescription());
 		} else {
 			pet.setDescription("Sem descrição.");
 		}
 
-		if (petModel.getImage_url() != null && petModel.getImage_url() != "") {
+		if (!ObjectUtils.isEmpty(petModel.getImage_url())) {
 			pet.setImage_url(petModel.getImage_url());
 		} else {
 			pet.setImage_url("https://api.adorable.io/avatars/200/" + UUID.randomUUID());
 		}
 
-		if (petModel.getOng_email() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getOng_email())) {
 			pet.setOng_email(petModel.getOng_email());
 		}
 
@@ -125,13 +130,13 @@ public class PetConverter {
 			pet.setLon(petModel.getLon());
 		}
 
-		if (petModel.getFotos() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getFotos())) {
 			pet.setFotos(petModel.getFotos());
 		}
 
 		pet.setDt_created(Timestamp.from(Instant.now()));
 
-		if (petModel.getCreated_by() != null) {
+		if (!ObjectUtils.isEmpty(petModel.getCreated_by())) {
 			pet.setCreated_by(petModel.getCreated_by());
 		}
 

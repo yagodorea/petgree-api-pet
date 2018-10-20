@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -24,8 +25,8 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public Pet getPetById(Long id) {
-        return petRepository.getOne(id);
+    public Optional<Pet> getPetById(Long id) {
+        return petRepository.findById(id);
     }
 
     @Override
@@ -33,20 +34,20 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public void deletePet(Long id) {
-        Pet pet = getPetById(id);
-        if (pet != null) {
+	    Optional<Pet> pet = getPetById(id);
+        if (pet.isPresent()) {
             petRepository.deleteById(id);
         }
     }
 
 	@Override
 	public Pet addPhoto(String image_url, Long id) {
-		Pet pet = getPetById(id);
-		if (pet != null) {
-			Set<String> fotos = pet.getFotos() != null ? pet.getFotos() : new HashSet<>();
+		Optional<Pet> pet = getPetById(id);
+		if (pet.isPresent()) {
+			Set<String> fotos = pet.get().getFotos() != null ? pet.get().getFotos() : new HashSet<>();
 			fotos.add(image_url);
 		}
-		return petRepository.save(pet);
+		return petRepository.save(pet.get());
 	}
 
 	@Override

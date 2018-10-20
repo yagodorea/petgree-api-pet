@@ -8,6 +8,7 @@ import com.dorea.petgree.pet.domain.PetSize;
 import com.dorea.petgree.pet.domain.PetStatus;
 import com.dorea.petgree.pet.domain.PetType;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -16,6 +17,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.criteria.Predicate;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,19 +81,24 @@ public class PetSpecification {
 					}
 				}
 
-				if (filter.getColor() != null) {
-					PetColor.ColorPet colorPet = PetColor.ColorPet.getColor(filter.getColor().toUpperCase());
-					if (colorPet != null) {
-						PetColor petColor = new PetColor();
-						petColor.setId(colorPet.getColor());
+				if (!ObjectUtils.isEmpty(filter.getColors())) {
+					List<Predicate> colorsPredicate = new ArrayList<>();
+					for (String color: filter.getColors()) {
+						System.out.println(color);
+						PetColor.ColorPet colorPet = PetColor.ColorPet.getColor(color.toUpperCase());
+						if (colorPet != null) {
+							PetColor petColor = new PetColor();
+							petColor.setId(colorPet.getColor());
 
-						Expression<List<PetColor>> cores = root.get("colors");
+							Expression<List<PetColor>> cores = root.get("colors");
 
-						predicates.add(cb.isMember(petColor,cores));
+							colorsPredicate.add(cb.isMember(petColor,cores));
+						}
 					}
+					predicates.add(cb.or(colorsPredicate.toArray(new Predicate[colorsPredicate.size()])));
 				}
 
-				if (filter.getGender() != null) {
+				if (!ObjectUtils.isEmpty(filter.getGender())) {
 					PetGender.GenderPet genderPet = PetGender.GenderPet.getGender(filter.getGender().toUpperCase());
 					if (genderPet != null) {
 						PetGender petGender = new PetGender();
@@ -100,7 +107,7 @@ public class PetSpecification {
 					}
 				}
 
-				if (filter.getSize() != null) {
+				if (!ObjectUtils.isEmpty(filter.getSize())) {
 					PetSize.SizePet sizePet = PetSize.SizePet.getSize(filter.getSize().toUpperCase());
 					if (sizePet != null) {
 						PetSize petSize = new PetSize();
@@ -109,7 +116,7 @@ public class PetSpecification {
 					}
 				}
 
-				if (filter.getStatus() != null) {
+				if (!ObjectUtils.isEmpty(filter.getStatus())) {
 					PetStatus.StatusPet statusPet = PetStatus.StatusPet.getStatus(filter.getStatus().toUpperCase());
 					if (statusPet != null) {
 						PetStatus petStatus = new PetStatus();
@@ -118,7 +125,7 @@ public class PetSpecification {
 					}
 				}
 
-				if (filter.getPelo() != null) {
+				if (!ObjectUtils.isEmpty(filter.getPelo())) {
 					PetPelo.PeloPet peloPet = PetPelo.PeloPet.getPelo(filter.getPelo().toUpperCase());
 					if (peloPet != null) {
 						PetPelo petPelo= new PetPelo();
@@ -126,9 +133,24 @@ public class PetSpecification {
 						predicates.add(cb.equal(root.get("pelo"),petPelo));
 					}
 				}
-
-				if (filter.getRaca() != null) {
-					predicates.add(cb.equal(root.get("raca"),"%" + filter.getRaca() + "%"));
+				/**
+				 *  Filtro de raça é mais imprevisível, a busca vai ser menos restritiva.
+				 *  Buscar cada palavra inserida (separar por espaço, vírgula, ponto e vírgula, ponto e hífen).
+				 *  Retornar resultados que contenham cada uma dessas palavras
+				 */
+				if (!ObjectUtils.isEmpty(filter.getRaca())) {
+					String[] racas = filter.getRaca().split("[ .,;-]");
+					List<Predicate> racesPredicate = new ArrayList<>();
+					for (String raca: racas) {
+						if (!ObjectUtils.isEmpty(raca)) {
+							racesPredicate.add(cb.like(root.get("raca"), "%" + raca + "%"));
+							if (!Normalizer.isNormalized(raca, Normalizer.Form.NFD)) {
+								String normalized = Normalizer.normalize(raca, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+								racesPredicate.add(cb.like(root.get("raca"), "%" + normalized + "%")); // Sem os acentos
+							}
+						}
+					}
+					predicates.add(cb.or(racesPredicate.toArray(new Predicate[racesPredicate.size()])));
 				}
 
 				return cb.and(predicates.toArray(new Predicate[predicates.size()]));

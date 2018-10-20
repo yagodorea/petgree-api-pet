@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class PetColor implements Serializable {
 
 	public enum ColorPet {
-		BRANCO(0), PRETO(1), MARROM(2), LARANJA(3), MALHADO(4), BEGE(5), OUTRO(6);
+		BRANCO(0), PRETO(1), MARROM(2), LARANJA(3), BEIGE(4), OUTRO(5);
 
 		ColorPet(int color) { this.color = color; }
 

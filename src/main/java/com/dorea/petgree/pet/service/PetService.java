@@ -4,12 +4,13 @@ import com.dorea.petgree.pet.domain.Pet;
 import com.dorea.petgree.pet.specification.PetFilter;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PetService {
 
     List<Pet> getPets();
 
-    Pet getPetById(Long id);
+	Optional<Pet> getPetById(Long id);
 
     List<Pet> getByFilter(PetFilter filter);
 
