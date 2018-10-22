@@ -6,6 +6,8 @@ import com.dorea.petgree.pet.repository.PetRepository;
 import com.dorea.petgree.pet.specification.PetFilter;
 import com.dorea.petgree.pet.specification.PetSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -18,11 +20,6 @@ public class PetServiceImpl implements PetService {
 
     @Autowired
     private PetRepository petRepository;
-
-    @Override
-    public List<Pet> getPets() {
-        return petRepository.findAll();
-    }
 
     @Override
     public Optional<Pet> getPetById(Long id) {
@@ -51,7 +48,8 @@ public class PetServiceImpl implements PetService {
 	}
 
 	@Override
-	public List<Pet> getByFilter(PetFilter filter) {
-		return petRepository.findAll(PetSpecification.byFilter(filter));
+	public List<Pet> getByFilter(PetFilter filter, Pageable pageable) {
+    	Page<Pet> result = petRepository.findAll(PetSpecification.byFilter(filter),pageable);
+		return result.getContent();
 	}
 }

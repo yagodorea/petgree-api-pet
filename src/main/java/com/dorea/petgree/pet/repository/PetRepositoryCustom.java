@@ -6,5 +6,5 @@ import com.dorea.petgree.pet.domain.PetType;
 import java.util.List;
 
 public interface PetRepositoryCustom {
-	List<Pet> findPetsByType(PetType type);
+//	List<Pet> findPetsByDistance(Double lat, Double lon);
 }

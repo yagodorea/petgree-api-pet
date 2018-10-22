@@ -18,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +42,9 @@ public class PetConverter {
 		}
 
 		if (!ObjectUtils.isEmpty(petModel.getType())) {
+			if (!Normalizer.isNormalized(petModel.getType(), Normalizer.Form.NFD))  {
+				petModel.setType(Normalizer.normalize(petModel.getType(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]",""));
+			}
 			TypePet typePet = TypePet.getType(petModel.getType().toUpperCase());
 			if (typePet != null) {
 				PetType petType = new PetType();
@@ -54,6 +58,9 @@ public class PetConverter {
 		}
 
 		if (!ObjectUtils.isEmpty(petModel.getGender())) {
+			if (!Normalizer.isNormalized(petModel.getGender(), Normalizer.Form.NFD))  {
+				petModel.setGender(Normalizer.normalize(petModel.getGender(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]",""));
+			}
 			GenderPet genderPet = GenderPet.getGender(petModel.getGender().toUpperCase());
 			if (genderPet != null) {
 				PetGender petGender = new PetGender();
@@ -63,6 +70,9 @@ public class PetConverter {
 		}
 
 		if (!ObjectUtils.isEmpty(petModel.getSize())) {
+			if (!Normalizer.isNormalized(petModel.getSize(), Normalizer.Form.NFD))  {
+				petModel.setSize(Normalizer.normalize(petModel.getSize(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]",""));
+			}
 			SizePet sizePet = SizePet.getSize(petModel.getSize().toUpperCase());
 			if (sizePet != null) {
 				PetSize petSize = new PetSize();
@@ -72,6 +82,9 @@ public class PetConverter {
 		}
 
 		if (!ObjectUtils.isEmpty(petModel.getPelo())) {
+			if (!Normalizer.isNormalized(petModel.getPelo(), Normalizer.Form.NFD))  {
+				petModel.setPelo(Normalizer.normalize(petModel.getPelo(), Normalizer.Form.NFD));
+			}
 			PeloPet peloPet = PeloPet.getPelo(petModel.getPelo().toUpperCase());
 			if (peloPet != null) {
 				PetPelo petPelo= new PetPelo();
@@ -107,7 +120,11 @@ public class PetConverter {
 		}
 
 		if (!ObjectUtils.isEmpty(petModel.getDescription())) {
-			pet.setDescription(petModel.getDescription());
+			if (petModel.getDescription().length() > 255) {
+				pet.setDescription(petModel.getDescription().substring(0,255));
+			} else {
+				pet.setDescription(petModel.getDescription());
+			}
 		} else {
 			pet.setDescription("Sem descrição.");
 		}

@@ -3,18 +3,26 @@ package com.dorea.petgree.pet.controller;
 import com.dorea.petgree.pet.controller.converter.PetConverter;
 import com.dorea.petgree.pet.domain.Pet;
 import com.dorea.petgree.pet.domain.PetModel;
+import com.dorea.petgree.pet.domain.PetStatus;
 import com.dorea.petgree.pet.domain.json.Photo;
 import com.dorea.petgree.pet.domain.json.User;
 import com.dorea.petgree.pet.exception.CreatorNotFoundException;
 import com.dorea.petgree.pet.exception.IdForbiddenException;
 import com.dorea.petgree.pet.exception.InvalidInputException;
 import com.dorea.petgree.pet.exception.NeedCreatorIdException;
+import com.dorea.petgree.pet.exception.NotificationMisuseException;
+import com.dorea.petgree.pet.exception.OwnerNotFoundException;
 import com.dorea.petgree.pet.exception.PetNotFoundException;
+import com.dorea.petgree.pet.service.EmailService;
 import com.dorea.petgree.pet.service.PetService;
 import com.dorea.petgree.pet.specification.PetFilter;
 import com.dorea.petgree.pet.validate.ValidatePet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -31,7 +39,13 @@ public class PetController implements WebMvcConfigurer {
     @Autowired
     private PetService petService;
 
-    private final String userApiUrl = "http://ec2-18-228-44-159.sa-east-1.compute.amazonaws.com:4243/users";
+    @Autowired
+    private EmailService emailService;
+
+	private final String adminEmail = "yago.dorea@gmail.com";
+
+//	private final String userApiUrl = "http://ec2-18-228-44-159.sa-east-1.compute.amazonaws.com:4243/users";
+	private final String userApiUrl = "http://localhost:4243/users";
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -59,32 +73,52 @@ public class PetController implements WebMvcConfigurer {
     		// Procurar o usuário na API User
 	        RestTemplate restTemplate = new RestTemplate();
 	        try {
-	        	restTemplate.getForObject(userApiUrl + "/email/" + String.valueOf(pet.getCreated_by()),User.class);
+	        	User user = restTemplate.getForObject(userApiUrl + "/email/" + String.valueOf(pet.getCreated_by()),User.class);
+	        	if (pet.getStatus().getId() == PetStatus.StatusPet.getStatus("PERDIDO").getStatus()) {
+	        		pet.setOwner_id(user.getId());
+		        }
+
+                Pet posted = petService.postPet(pet);
+
+    	        // Adicionar o pet na lista owned do usuário
+		        if (pet.getStatus().getId() == PetStatus.StatusPet.getStatus("PERDIDO").getStatus()) {
+			        restTemplate.postForObject(userApiUrl + "/" + user.getId() + "/owned", posted.getId(),Void.class);
+		        }
+
+    	        return posted;
 	        } catch (HttpClientErrorException error) {
-	        	throw new CreatorNotFoundException(error.getMessage());
+		        throw new CreatorNotFoundException(error.getMessage());
 	        }
         }
-	    Long id = petService.postPet(pet).getId();
-    	Pet posted = getPet(id);
-        return posted;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public List<Pet> getPets(
     		@RequestParam(required = false) String type,
-		    @RequestParam(required = false) String colors[],
+		    @RequestParam(required = false) String[] colors,
 		    @RequestParam(required = false) String gender,
 		    @RequestParam(required = false) String raca,
 		    @RequestParam(required = false) String pelo,
 		    @RequestParam(required = false) String size,
-		    @RequestParam(required = false) String status) {
+		    @RequestParam(required = false) String status,
+		    @RequestParam(required = false) Integer limit,
+		    @RequestParam(required = false) Integer offset) {
+    	if (ObjectUtils.isEmpty(limit) || limit < 1) {
+    		limit = 10;
+	    }
+	    if (ObjectUtils.isEmpty(offset) || offset < 1) {
+    		offset = 1;
+	    }
+
+	    Pageable pageable = PageRequest.of(offset - 1, limit,Sort.by("id"));
+
         System.out.println("getPets invoked.");
 	    PetFilter filter = new PetFilter();
 
 	    filter.setAllFilters(type,colors,gender,raca,pelo,size,status);
 
-        return petService.getByFilter(filter);
+	    return petService.getByFilter(filter,pageable);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -135,5 +169,53 @@ public class PetController implements WebMvcConfigurer {
 	    }
 	    petService.addPhoto(photo.getImageUrl(),id);
     	return pet.get();
+    }
+
+    @RequestMapping(value = "/{id}/notification", method = RequestMethod.POST)
+    public void notificateOwner(@PathVariable("id") Long id,
+                                @RequestBody User user) {
+	    System.out.println("notificateOwner invoked.");
+    	Optional<Pet> pet = petService.getPetById(id);
+    	if (!pet.isPresent()) {
+    		throw new PetNotFoundException(id);
+	    }
+	    if (!pet.get().getStatus().getDescription().equalsIgnoreCase("PERDIDO")) {
+    		System.out.println(pet.get().getStatus().getDescription());
+    		throw new NotificationMisuseException(pet.get().getStatus().getDescription());
+	    }
+
+	    Long ownerId = pet.get().getOwner_id();
+
+    	if (ObjectUtils.isEmpty(ownerId)) {
+    		throw new OwnerNotFoundException();
+	    }
+
+	    // Procurar o usuário na API User
+	    RestTemplate restTemplate = new RestTemplate();
+	    try {
+		    User owner = restTemplate.getForObject(userApiUrl + "/" + ownerId, User.class);
+		    String ownerEmail = owner.getEmail();
+
+		    String phones = "";
+		    if (!ObjectUtils.isEmpty(user.getTelefones())) {
+		    	phones += "Você também pode contatá-lo através dos telefones<bold>";
+		    	for(String telefone : user.getTelefones()) {
+		    		phones += " " + telefone;
+			    }
+			    phones += "</bold>";
+		    }
+
+		    emailService.sendEmail(
+		    		ownerEmail,
+				    adminEmail,
+				    "Pet encontrado!",
+				    "Boas notícias! O seu pet <b>" + pet.get().getName() + "</b> foi encontrado!<br/><br/>"
+					    + "O usuário <b>" + user.getAvatar().getName() + "</b> acabou de reportar que o encontrou.<br/><br/>"
+					    + "Entre em contato através do e-mail <b>" + user.getEmail() + "</b>.<br/>" + phones
+		    );
+	    } catch (HttpClientErrorException error) {
+		    throw new OwnerNotFoundException();
+	    }
+		System.out.println("notification sent.");
     }
 }

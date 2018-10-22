@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class PetPelo implements Serializable {
 
 	public enum PeloPet {
-		NENHUM(0), POUCO(1), MÉDIO(2), MUITO(3);
+		NENHUM(0), POUCO(1), MEDIO(2), MUITO(3);
 
 		PeloPet(int pelo) { this.pelo = pelo; }
 

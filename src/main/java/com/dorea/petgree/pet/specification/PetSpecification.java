@@ -13,58 +13,13 @@ import org.springframework.util.ObjectUtils;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 import javax.persistence.criteria.Predicate;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PetSpecification {
-
-	public static Specification<Pet> hasType(PetType type) {
-		return (pet, cq, cb) -> cb.equal(pet.get("type"),type);
-	}
-
-	public static Specification<Pet> hasRaca(String raca) {
-		return (pet, cq, cb) -> cb.equal(pet.get("raca"),"%" + raca + "%");
-	}
-
-	public static Specification<Pet> hasGender(PetGender gender) {
-		return (pet, cq, cb) -> cb.equal(pet.get("gender"),gender);
-	}
-
-	public static Specification<Pet> hasSize(PetSize size) {
-		return (pet, cq, cb) -> cb.equal(pet.get("size"),size);
-	}
-
-	public static Specification<Pet> hasStatus(PetStatus status) {
-		return (pet, cq, cb) -> cb.equal(pet.get("status"),status);
-	}
-
-	public static Specification<Pet> hasPelo(PetPelo pelo) {
-		return (pet, cq, cb) -> cb.equal(pet.get("pelo"),pelo);
-	}
-
-	public static Specification<Pet> byColor(PetColor color) {
-		return (Root<Pet> pet, CriteriaQuery<?> cq, CriteriaBuilder cb) -> {
-			if (color != null) {
-
-				Subquery<Pet> sq = cq.subquery(Pet.class);
-
-				Root<PetColor> petcolor = cq.from(PetColor.class);
-
-				Join<PetColor,Pet> sqPet = petcolor.join("pet_id");
-
-				sq.select(sqPet).where(cb.equal(petcolor.get("colors_id_color"),color.getId()));
-
-				return cb.in(pet).value(sq);
-			} else {
-				return cb.in(pet).value(new Pet());
-			}
-		};
-	}
 
 	public static Specification<Pet> byFilter(PetFilter filter) {
 		return new Specification<Pet>() {
@@ -152,6 +107,16 @@ public class PetSpecification {
 					}
 					predicates.add(cb.or(racesPredicate.toArray(new Predicate[racesPredicate.size()])));
 				}
+//
+//				Expression lat = cb.literal(37.183963775634766);
+//				Expression lon = cb.literal(-123.80656433105469);
+//
+//
+//				Root<PetDistance> distance = cq.from(PetDistance.class);
+//
+//				Join<Pet,PetDistance> join = root.join("id");
+//				cb.function("gc_dist",Double.class,lat,lon);
+
 
 				return cb.and(predicates.toArray(new Predicate[predicates.size()]));
 			}
