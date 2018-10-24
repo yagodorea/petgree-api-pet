@@ -48,16 +48,4 @@ public class ValidatePetTest {
 
 		assertTrue(ValidatePet.isValid(pet));
 	}
-
-	@Test
-	public void shouldConvertWktToGeometry() {
-		try {
-			Geometry geometry = new WKTReader().read("LINEARRING(0 0, 1 1, 1 2, 1 1, 0 0)");
-			assertEquals("Point", geometry.getGeometryType());
-			assertTrue(geometry instanceof Point);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-	}
 }
