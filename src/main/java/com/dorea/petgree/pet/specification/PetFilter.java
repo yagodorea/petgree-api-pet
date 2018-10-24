@@ -8,8 +8,11 @@ public class PetFilter {
 	private String pelo;
 	private String size;
 	private String status;
+	private Double lat;
+	private Double lon;
+	private Double radius;
 
-	public void setAllFilters(String type, String[] colors, String gender, String raca, String pelo, String size, String status) {
+	public void setAllFilters(String type, String[] colors, String gender, String raca, String pelo, String size, String status, Double lat, Double lon, Double radius) {
 		this.type = type;
 		this.colors= colors;
 		this.gender = gender;
@@ -17,6 +20,9 @@ public class PetFilter {
 		this.pelo = pelo;
 		this.size = size;
 		this.status = status;
+		this.lat = lat;
+		this.lon = lon;
+		this.radius = radius;
 	}
 
 	public String getType() {
@@ -73,5 +79,29 @@ public class PetFilter {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Double getLat() {
+		return lat;
+	}
+
+	public void setLat(Double lat) {
+		this.lat = lat;
+	}
+
+	public Double getLon() {
+		return lon;
+	}
+
+	public void setLon(Double lon) {
+		this.lon = lon;
+	}
+
+	public Double getRadius() {
+		return radius;
+	}
+
+	public void setRadius(Double radius) {
+		this.radius = radius;
 	}
 }

@@ -14,6 +14,14 @@ import com.dorea.petgree.pet.domain.PetType;
 import com.dorea.petgree.pet.domain.PetType.TypePet;
 import com.dorea.petgree.pet.domain.PetSize.SizePet;
 import com.dorea.petgree.pet.domain.PetStatus.StatusPet;
+import com.dorea.petgree.pet.repository.serializer.JsonToPointDeserializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.util.JsonParserSequence;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
 import org.springframework.util.ObjectUtils;
 
 import javax.validation.constraints.NotNull;
@@ -21,6 +29,7 @@ import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -135,10 +144,6 @@ public class PetConverter {
 			pet.setImage_url("https://api.adorable.io/avatars/200/" + UUID.randomUUID());
 		}
 
-		if (!ObjectUtils.isEmpty(petModel.getOng_email())) {
-			pet.setOng_email(petModel.getOng_email());
-		}
-
 		if (petModel.getLat() != null) {
 			pet.setLat(petModel.getLat());
 		}
@@ -149,6 +154,15 @@ public class PetConverter {
 
 		if (!ObjectUtils.isEmpty(petModel.getFotos())) {
 			pet.setFotos(petModel.getFotos());
+		}
+
+		if (Objects.nonNull(petModel.getLat()) && Objects.nonNull(petModel.getLon())) {
+			GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+			// LEMBRAR QUE AS COORDENADAS SÃO INVERTIDAS NO POSTGIS!!!
+			Point point = geometryFactory.createPoint(new Coordinate(petModel.getLon(), petModel.getLat()));
+
+			pet.setGeom(point);
 		}
 
 		pet.setDt_created(Timestamp.from(Instant.now()));

@@ -7,6 +7,10 @@ import com.dorea.petgree.pet.domain.PetPelo;
 import com.dorea.petgree.pet.domain.PetSize;
 import com.dorea.petgree.pet.domain.PetStatus;
 import com.dorea.petgree.pet.domain.PetType;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.util.GeometricShapeFactory;
+import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
 
@@ -20,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PetSpecification {
-
 	public static Specification<Pet> byFilter(PetFilter filter) {
 		return new Specification<Pet>() {
 			@Override
@@ -107,20 +110,33 @@ public class PetSpecification {
 					}
 					predicates.add(cb.or(racesPredicate.toArray(new Predicate[racesPredicate.size()])));
 				}
-//
-//				Expression lat = cb.literal(37.183963775634766);
-//				Expression lon = cb.literal(-123.80656433105469);
-//
-//
-//				Root<PetDistance> distance = cq.from(PetDistance.class);
-//
-//				Join<Pet,PetDistance> join = root.join("id");
-//				cb.function("gc_dist",Double.class,lat,lon);
 
+
+				if (!ObjectUtils.isEmpty(filter.getLat()) && !ObjectUtils.isEmpty(filter.getLon())) {
+					Geometry area;
+					if (!ObjectUtils.isEmpty(filter.getRadius())) {
+						area = createCircle(filter.getLon(),filter.getLat(),filter.getRadius());
+						predicates.add(new WithinPredicate((CriteriaBuilderImpl) cb, root.get("geom"), area));
+					} else {
+						area = createCircle(filter.getLat(),filter.getLon(),10.0);
+						predicates.add(new WithinPredicate((CriteriaBuilderImpl) cb, root.get("geom"), area));
+					}
+				}
 
 				return cb.and(predicates.toArray(new Predicate[predicates.size()]));
 			}
 		};
+	}
+
+	private static Geometry createCircle(double x, double y, final double RADIUS) {
+
+		GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
+		shapeFactory.setNumPoints(32);
+		shapeFactory.setCentre(new Coordinate(x, y));//there are your coordinates
+		shapeFactory.setSize(RADIUS * 2);//this is how you set the radius
+		Geometry shape = shapeFactory.createCircle();
+		shape.setSRID(4326);
+		return shape;
 	}
 
 }

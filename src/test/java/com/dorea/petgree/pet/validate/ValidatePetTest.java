@@ -9,11 +9,18 @@ import com.dorea.petgree.pet.domain.PetSize;
 import com.dorea.petgree.pet.domain.PetSize.SizePet;
 import com.dorea.petgree.pet.domain.PetType;
 import com.dorea.petgree.pet.domain.PetType.TypePet;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ValidatePetTest {
 
@@ -39,6 +46,18 @@ public class ValidatePetTest {
 		size.setId(SizePet.GRANDE.getSize());
 		pet.setSize(size);
 
-		Assert.assertTrue(ValidatePet.isValid(pet));
+		assertTrue(ValidatePet.isValid(pet));
+	}
+
+	@Test
+	public void shouldConvertWktToGeometry() {
+		try {
+			Geometry geometry = new WKTReader().read("LINEARRING(0 0, 1 1, 1 2, 1 1, 0 0)");
+			assertEquals("Point", geometry.getGeometryType());
+			assertTrue(geometry instanceof Point);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

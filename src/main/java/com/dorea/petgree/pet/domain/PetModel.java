@@ -36,8 +36,6 @@ public class PetModel {
 	@JsonInclude(JsonInclude.Include.ALWAYS)
 	private String image_url;
 
-	private String ong_email;
-
 	private Float lat;
 
 	private Float lon;
@@ -163,14 +161,6 @@ public class PetModel {
 
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
-	}
-
-	public String getOng_email() {
-		return ong_email;
-	}
-
-	public void setOng_email(String ong_email) {
-		this.ong_email = ong_email;
 	}
 
 	public String getCreated_by() {

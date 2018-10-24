@@ -10,8 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,13 +47,31 @@ public class PetServiceImpl implements PetService {
 		if (pet.isPresent()) {
 			Set<String> fotos = pet.get().getFotos() != null ? pet.get().getFotos() : new HashSet<>();
 			fotos.add(image_url);
+			return petRepository.save(pet.get());
 		}
-		return petRepository.save(pet.get());
+		return null;
+
 	}
 
 	@Override
 	public List<Pet> getByFilter(PetFilter filter, Pageable pageable) {
     	Page<Pet> result = petRepository.findAll(PetSpecification.byFilter(filter),pageable);
+
+    	if (Objects.nonNull(filter.getLat()) && Objects.nonNull(filter.getLon())) {
+		    return sortByDistance(result.getContent(), filter.getLat(), filter.getLon());
+	    }
+
 		return result.getContent();
+	}
+
+	private static List<Pet> sortByDistance(List<Pet> pets, Double lat, Double lon) {
+		DistanceComparator.setThisLat(lat);
+		DistanceComparator.setThisLon(lon);
+
+		List<Pet> modifiableList = new ArrayList<>(pets);
+
+		modifiableList.sort(new DistanceComparator());
+
+		return modifiableList;
 	}
 }

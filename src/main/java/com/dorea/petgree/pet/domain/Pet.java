@@ -1,6 +1,5 @@
 package com.dorea.petgree.pet.domain;
 
-
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -15,6 +14,12 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Set;
+
+import com.dorea.petgree.pet.repository.serializer.JsonToPointDeserializer;
+import com.dorea.petgree.pet.repository.serializer.PointToJsonSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.vividsolutions.jts.geom.Point;
 
 @Entity
 @Table(name = "pets")
@@ -64,9 +69,6 @@ public class Pet implements Serializable {
     @Column(name = "image_url")
     private String image_url;
 
-    @Column(name = "ong_email")
-    private String ong_email;
-
     @Column(name = "lat")
     private Float lat;
 
@@ -82,6 +84,19 @@ public class Pet implements Serializable {
 
 	@Column(name = "created_by")
 	private String created_by;
+
+	@JsonSerialize(using = PointToJsonSerializer.class)
+	@JsonDeserialize(using = JsonToPointDeserializer.class)
+	@Column(name = "geom", columnDefinition = "Geometry(Point,4326)")
+	private Point geom;
+
+	public Point getGeom() {
+		return geom;
+	}
+
+	public void setGeom(Point geom) {
+		this.geom = geom;
+	}
 
 	public Float getLat() {
 		return lat;
@@ -198,14 +213,6 @@ public class Pet implements Serializable {
 
 	public void setImage_url(String image_url) {
 		this.image_url = image_url;
-	}
-
-	public String getOng_email() {
-		return ong_email;
-	}
-
-	public void setOng_email(String ong_email) {
-		this.ong_email = ong_email;
 	}
 
 	public Timestamp getDt_created() {

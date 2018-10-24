@@ -44,8 +44,8 @@ public class PetController implements WebMvcConfigurer {
 
 	private final String adminEmail = "yago.dorea@gmail.com";
 
-//	private final String userApiUrl = "http://ec2-18-228-44-159.sa-east-1.compute.amazonaws.com:4243/users";
-	private final String userApiUrl = "http://localhost:4243/users";
+	private final String userApiUrl = "http://ec2-18-228-44-159.sa-east-1.compute.amazonaws.com:4243/users";
+//	private final String userApiUrl = "http://localhost:4243/users";
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -102,6 +102,9 @@ public class PetController implements WebMvcConfigurer {
 		    @RequestParam(required = false) String pelo,
 		    @RequestParam(required = false) String size,
 		    @RequestParam(required = false) String status,
+		    @RequestParam(required = false) Double lat,
+		    @RequestParam(required = false) Double lon,
+		    @RequestParam(required = false) Double radius,
 		    @RequestParam(required = false) Integer limit,
 		    @RequestParam(required = false) Integer offset) {
     	if (ObjectUtils.isEmpty(limit) || limit < 1) {
@@ -110,13 +113,12 @@ public class PetController implements WebMvcConfigurer {
 	    if (ObjectUtils.isEmpty(offset) || offset < 1) {
     		offset = 1;
 	    }
-
-	    Pageable pageable = PageRequest.of(offset - 1, limit,Sort.by("id"));
+	    Pageable pageable = PageRequest.of(offset - 1, limit);
 
         System.out.println("getPets invoked.");
 	    PetFilter filter = new PetFilter();
 
-	    filter.setAllFilters(type,colors,gender,raca,pelo,size,status);
+	    filter.setAllFilters(type,colors,gender,raca,pelo,size,status,lat,lon,radius);
 
 	    return petService.getByFilter(filter,pageable);
     }
