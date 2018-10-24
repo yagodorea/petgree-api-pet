@@ -29,8 +29,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/pets")
@@ -145,6 +148,21 @@ public class PetController implements WebMvcConfigurer {
 	    Optional<Pet> pet = petService.getPetById(id);
 	    if (pet.isPresent()) {
 	        petService.deletePet(id);
+	        if (Objects.nonNull(pet.get().getOwner_id())) {
+		        // Procurar o usuário na API User
+		        RestTemplate restTemplate = new RestTemplate();
+		        try {
+			        User user = restTemplate.getForObject(userApiUrl + "/" + String.valueOf(pet.get().getOwner_id()), User.class);
+			        Set<Long> owned = new HashSet<>(user.getOwned());
+			        if (owned.contains(pet.get().getId())) {
+			        	owned.remove(pet.get().getId());
+			        }
+			        user.setOwned(owned);
+			        restTemplate.put(userApiUrl + "/" + user.getId(), user);
+		        } catch (HttpClientErrorException e) {
+		        	throw new HttpClientErrorException(e.getStatusCode());
+		        }
+	        }
         }
         else {
 	        throw new PetNotFoundException(id);

@@ -9,17 +9,11 @@ import com.dorea.petgree.pet.domain.PetSize;
 import com.dorea.petgree.pet.domain.PetSize.SizePet;
 import com.dorea.petgree.pet.domain.PetType;
 import com.dorea.petgree.pet.domain.PetType.TypePet;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ValidatePetTest {
