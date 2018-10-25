@@ -4,8 +4,6 @@ import com.dorea.petgree.pet.domain.Pet;
 
 public class ValidatePet {
     public static boolean isValid(Pet pet) {
-        return (pet.getType() != null &&
-		        pet.getGender() != null &&
-		        pet.getSize() != null);
+        return (pet.getType() != null);
     }
 }

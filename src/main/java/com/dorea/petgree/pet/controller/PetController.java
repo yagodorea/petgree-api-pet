@@ -20,7 +20,6 @@ import com.dorea.petgree.pet.validate.ValidatePet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +75,7 @@ public class PetController implements WebMvcConfigurer {
     		// Procurar o usuário na API User
 	        RestTemplate restTemplate = new RestTemplate();
 	        try {
-	        	User user = restTemplate.getForObject(userApiUrl + "/email/" + String.valueOf(pet.getCreated_by()),User.class);
+	        	User user = restTemplate.getForObject(userApiUrl + "/email/" + pet.getCreated_by(),User.class);
 	        	if (pet.getStatus().getId() == PetStatus.StatusPet.getStatus("PERDIDO").getStatus()) {
 	        		pet.setOwner_id(user.getId());
 		        }
@@ -84,7 +83,9 @@ public class PetController implements WebMvcConfigurer {
                 Pet posted = petService.postPet(pet);
 
     	        // Adicionar o pet na lista owned do usuário
-		        if (pet.getStatus().getId() == PetStatus.StatusPet.getStatus("PERDIDO").getStatus()) {
+		        if (pet.getStatus().getId() == PetStatus.StatusPet.getStatus("PERDIDO").getStatus()
+				        || pet.getStatus().getId() == PetStatus.StatusPet.getStatus("OK").getStatus()
+				        || pet.getStatus().getId() == PetStatus.StatusPet.getStatus("QUER_CRUZAR").getStatus()) {
 			        restTemplate.postForObject(userApiUrl + "/" + user.getId() + "/owned", posted.getId(),Void.class);
 		        }
 
